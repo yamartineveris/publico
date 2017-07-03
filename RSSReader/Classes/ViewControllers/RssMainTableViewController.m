@@ -110,9 +110,7 @@
     cell.titulo.text =datos.titulo;
     cell.descripcion.text = datos.descripcion;
     
-      NSURL *url = [NSURL URLWithString:datos.imagenPortada];
-    NSData *dataImage = [[NSData alloc] initWithContentsOfURL:url];
-    cell.imagen.image  = [UIImage imageWithData:dataImage];
+         cell.imagen.image  = [UIImage imageWithData:[datos getImagen] ];
    
     return cell;
 }
@@ -149,7 +147,10 @@
     if ([element isEqualToString:@"title"]) {
         [title appendString:string];
     } else if ([element isEqualToString:@"link"]) {
-        [link appendString:string];
+        
+        NSString *linkT =  [string stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        
+        [link appendString:linkT];
     }else if ([element isEqualToString:@"description"]) {
 
        NSString * result= [self firstImgUrlString:string];

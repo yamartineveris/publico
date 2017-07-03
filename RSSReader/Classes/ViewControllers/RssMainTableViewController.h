@@ -12,6 +12,4 @@
 @property (strong, nonatomic) IBOutlet UITableView *tableViewRSS;
 
 
--(NSString *) stringByStrippingHTML ;
-
 @end

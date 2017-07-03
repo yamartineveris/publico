@@ -28,4 +28,19 @@
     
     return copy;
 }
+
+- (NSData * )getImagen
+
+{
+    if (!_datosImagen)
+    {
+        NSURL *url = [NSURL URLWithString:_imagenPortada];
+        _datosImagen = [[NSData alloc] initWithContentsOfURL:url];
+    }
+    
+    return _datosImagen;
+    
+    
+}
+
 @end

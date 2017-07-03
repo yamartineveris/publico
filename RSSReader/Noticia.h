@@ -17,5 +17,8 @@
 @property (copy, nonatomic) NSString *imagenPortada;
 @property (copy, nonatomic) NSString *enlace;
 
+@property (copy, nonatomic) NSData *datosImagen;
+- (NSData * )getImagen;
+
 
 @end
