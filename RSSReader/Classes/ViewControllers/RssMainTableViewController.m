@@ -18,6 +18,7 @@
 #define kNibRssCell @"RSSTableViewCell"
 #define kRSSCell @"RSSTableViewCell"
 #define kSegueDetail @"detail"
+#define kProperties @"feeds"
 
 
 @interface RssMainTableViewController ()
@@ -117,7 +118,7 @@
         
         [alertView show];
         
-        NSData *serializeda = [[NSUserDefaults standardUserDefaults] objectForKey:@"feeds"];
+        NSData *serializeda = [[NSUserDefaults standardUserDefaults] objectForKey:kProperties];
         NSMutableArray *myArray = [NSKeyedUnarchiver unarchiveObjectWithData:serializeda];
         
         feeds = myArray;
@@ -170,10 +171,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:@"RSSCell" ];
-    
-    
-    RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:kRSSCell forIndexPath:indexPath];
+      RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:kRSSCell forIndexPath:indexPath];
     Noticia * datos ;
     
     
@@ -270,14 +268,11 @@
 }
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
     
-    
-    
-    // [self.tableViewRSS reloadData];
     if (feeds.count>0)
         
     {
         NSData *serialized = [NSKeyedArchiver archivedDataWithRootObject:feeds];
-        [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"feeds"];
+        [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:kProperties];
         
         
     }
