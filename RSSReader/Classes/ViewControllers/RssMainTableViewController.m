@@ -33,7 +33,7 @@
     NSMutableString *image;
     Noticia *noticia;
     NSString *element;
-         }
+}
 @end
 
 @implementation RssMainTableViewController
@@ -58,12 +58,12 @@
     [self.navigationItem setTitle:NSLocalizedString(@"RSS_STRING_TITLE", nil)];
     _tableViewRSS.hidden = true;
     _tableViewRSS.backgroundColor = [UIColor blueColor];
-
+    
     
     [self loadData];
     [self configureSearch];
     
-   
+    
 }
 
 -(void) registerTableView
@@ -77,7 +77,7 @@
     [self.tableViewRSS setDelegate:self];
     [self.tableViewRSS setDataSource:self];
     
-
+    
 }
 
 -(void) configureSearch
@@ -90,7 +90,7 @@
     self.searchController.searchBar.delegate = self;
     self.tableViewRSS.tableHeaderView = self.searchController.searchBar;
     self.definesPresentationContext = YES;
-
+    
     
 }
 
@@ -102,8 +102,8 @@
     
     [parser setDelegate:self];
     [parser setShouldResolveExternalEntities:NO];
- 
-     BOOL result = [parser parse];
+    
+    BOOL result = [parser parse];
     
     if (!result)
     {
@@ -121,18 +121,18 @@
         NSMutableArray *myArray = [NSKeyedUnarchiver unarchiveObjectWithData:serializeda];
         
         feeds = myArray;
-
-            if (feeds.count>0)
-            {
-                _tableViewRSS.hidden = false;
-                [self registerTableView];
-
-            }
-            else
-            {
-                _tableViewRSS.hidden = true;
-
-            }
+        
+        if (feeds.count>0)
+        {
+            _tableViewRSS.hidden = false;
+            [self registerTableView];
+            
+        }
+        else
+        {
+            _tableViewRSS.hidden = true;
+            
+        }
         
     }
     else
@@ -140,9 +140,9 @@
         _tableViewRSS.hidden = false;
         // en el caso de tener datos . cargamos la tabla.
         [self registerTableView];
-
+        
     }
-
+    
 }
 
 
@@ -166,22 +166,22 @@
         return feeds.count;
     }
     return 0;
-
+    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-   // RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:@"RSSCell" ];
+    // RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:@"RSSCell" ];
     
     
     RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:kRSSCell forIndexPath:indexPath];
     Noticia * datos ;
     
-
+    
     if (self.searchController.isActive && (![self.searchController.searchBar.text isEqualToString:@""])) {
         datos =(Noticia *) [self.searchResults objectAtIndex:indexPath.row];
     }
     else {
-       datos= (Noticia *)[feeds objectAtIndex:indexPath.row];
+        datos= (Noticia *)[feeds objectAtIndex:indexPath.row];
     }
     
     
@@ -189,15 +189,15 @@
     cell.titulo.text =datos.titulo;
     cell.descripcion.text = datos.descripcion;
     
-         cell.imagen.image  = [UIImage imageWithData:[datos getImagen] ];
-   
+    cell.imagen.image  = [UIImage imageWithData:[datos getImagen] ];
+    
     return cell;
 }
 
 
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-
+    
     [self performSegueWithIdentifier:kSegueDetail sender:nil];
 }
 
@@ -216,7 +216,7 @@
         link    = [[NSMutableString alloc] init];
         description = [[NSMutableString alloc] init];
         image = [[NSMutableString alloc] init];
-
+        
     }
     
 }
@@ -234,26 +234,20 @@
         
         [link appendString:linkT];
     }else if ([element isEqualToString:@"description"]) {
-
+        
         NSString * result= [RSSUtils firstImgUrlString:string];
-        
-
-        
         
         if (result)
         {
             [image appendString:result];
-
+            
         }
-
+        
         NSString *stringWithoutHTML =
         [RSSUtils stringByStrippingHTML:string];
         
- 
-        
-        
         [description appendString:stringWithoutHTML];
-
+        
     }
     
 }
@@ -267,8 +261,8 @@
         noticia.imagenPortada = image;
         noticia.enlace = link;
         
-     
-
+        
+        
         [feeds addObject:[noticia copy]];
         
     }
@@ -276,17 +270,17 @@
 }
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
     
-  
-
-   // [self.tableViewRSS reloadData];
- if (feeds.count>0)
-     
- {
-     NSData *serialized = [NSKeyedArchiver archivedDataWithRootObject:feeds];
-     [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"feeds"];
- 
-     
-     }
+    
+    
+    // [self.tableViewRSS reloadData];
+    if (feeds.count>0)
+        
+    {
+        NSData *serialized = [NSKeyedArchiver archivedDataWithRootObject:feeds];
+        [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"feeds"];
+        
+        
+    }
     
 }
 
@@ -299,8 +293,8 @@
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-
-     NSIndexPath *indexPath = [self.tableViewRSS indexPathForSelectedRow];
+    
+    NSIndexPath *indexPath = [self.tableViewRSS indexPathForSelectedRow];
     Noticia * datos ;
     
     if (self.searchController.isActive && (![self.searchController.searchBar.text isEqualToString:@""])) {
@@ -309,16 +303,16 @@
     else {
         datos= (Noticia *)[feeds objectAtIndex:indexPath.row];
     }
-
-
-
-        if([segue.identifier isEqualToString:@"detail"]){
-            RssDetailViewController *VC = (RssDetailViewController*)segue.destinationViewController;
-            
+    
+    
+    
+    if([segue.identifier isEqualToString:@"detail"]){
+        RssDetailViewController *VC = (RssDetailViewController*)segue.destinationViewController;
         
-          
-            VC.noticia = datos;
-        }
+        
+        
+        VC.noticia = datos;
+    }
 }
 
 #pragma mark - Getters / Setters
