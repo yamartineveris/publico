@@ -43,4 +43,30 @@
     
 }
 
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    
+    [coder encodeObject:_titulo forKey:@"_titulo"];
+    [coder encodeObject:_autor forKey:@"_autor"];
+    [coder encodeObject:_fecha forKey:@"_fecha"];
+    [coder encodeObject:_descripcion forKey:@"_descripcion"];
+    [coder encodeObject:_imagenPortada forKey:@"_imagenPortada"];
+    [coder encodeObject:_enlace forKey:@"_enlace"];
+
+}
+
+- (id)initWithCoder:(NSCoder *)coder {
+    
+    _titulo = [coder decodeObjectForKey:@"_titulo"] ;
+    _autor = [coder decodeObjectForKey:@"_autor"] ;
+    _fecha = [coder decodeObjectForKey:@"_fecha"] ;
+    _descripcion = [coder decodeObjectForKey:@"_descripcion"] ;
+    _imagenPortada = [coder decodeObjectForKey:@"_imagenPortada"] ;
+    _enlace = [coder decodeObjectForKey:@"_enlace"] ;
+
+
+    
+    return self;
+}
+
 @end

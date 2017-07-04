@@ -14,7 +14,7 @@
 
 //CONSTANTS
 
-#define kBaseURLRSS @"https://www.xatakandroid.com/tag/nexus/rss2.xml"
+#define kBaseURLRSS @"https://www.xatakandroid.com/tag/iphone/rss2.xml"
 #define kNibRssCell @"RSSTableViewCell"
 #define kRSSCell @"RSSTableViewCell"
 #define kSegueDetail @"detail"
@@ -45,6 +45,8 @@
     
     [super viewDidLoad];
     
+    
+    
     //Configuramos vista
     UIColor *  color = [UIColor lightGrayColor];
     [self.navigationController.navigationBar setTitleTextAttributes:
@@ -54,9 +56,10 @@
     // Cambiamos el navigation Title.
     
     [self.navigationItem setTitle:NSLocalizedString(@"RSS_STRING_TITLE", nil)];
+    _tableViewRSS.hidden = true;
+    _tableViewRSS.backgroundColor = [UIColor blueColor];
 
     
-    [self registerTableView];
     [self loadData];
     [self configureSearch];
     
@@ -99,9 +102,47 @@
     
     [parser setDelegate:self];
     [parser setShouldResolveExternalEntities:NO];
-    [parser parse];
+ 
+     BOOL result = [parser parse];
     
-    
+    if (!result)
+    {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", @"Error")
+                                                            message:NSLocalizedString(@"No se pueden actualizar datos", @"No se pueden actualizar datos")
+                                                           delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"OK", @"OK")
+                                                  otherButtonTitles:nil];
+        
+        
+        
+        [alertView show];
+        
+        NSData *serializeda = [[NSUserDefaults standardUserDefaults] objectForKey:@"feeds"];
+        NSMutableArray *myArray = [NSKeyedUnarchiver unarchiveObjectWithData:serializeda];
+        
+        feeds = myArray;
+
+            if (feeds.count>0)
+            {
+                _tableViewRSS.hidden = false;
+                [self registerTableView];
+
+            }
+            else
+            {
+                _tableViewRSS.hidden = true;
+
+            }
+        
+    }
+    else
+    {
+        _tableViewRSS.hidden = false;
+        // en el caso de tener datos . cargamos la tabla.
+        [self registerTableView];
+
+    }
+
 }
 
 
@@ -235,9 +276,21 @@
 }
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
     
-    [self.tableViewRSS reloadData];
+  
+
+   // [self.tableViewRSS reloadData];
+ if (feeds.count>0)
+     
+ {
+     NSData *serialized = [NSKeyedArchiver archivedDataWithRootObject:feeds];
+     [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"feeds"];
+ 
+     
+     }
     
 }
+
+
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
@@ -300,7 +353,8 @@
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController
 {
     
-      [self.tableView reloadData];
+    [self.tableViewRSS
+     reloadData];
 }
 
 
