@@ -8,85 +8,104 @@
 
 #import "RssMainTableViewController.h"
 #import "RSSTableViewCell.h"
-#import "RssDetailNewViewController.h"
+#import "RssDetailViewController.h"
 #import "Noticia.h"
+#import "RSSUtils.h"
+
+//CONSTANTS
+
+#define kBaseURLRSS @"https://www.xatakandroid.com/tag/nexus/rss2.xml"
+#define kNibRssCell @"RSSTableViewCell"
+#define kRSSCell @"RSSTableViewCell"
+#define kSegueDetail @"detail"
 
 
 @interface RssMainTableViewController ()
 {
     NSXMLParser *parser;
     NSMutableArray *feeds;
-    
-    NSMutableArray *titles;
-    NSMutableArray *descriptions;
-    NSMutableArray *links;
-
-    
+    NSArray *searchResults;
     NSMutableDictionary *item;
-    NSMutableString *titlesString;
     NSMutableString *title;
     NSMutableString *description;
-
     NSMutableData * data;
     NSMutableString *link;
     NSMutableString *image;
     Noticia *noticia;
-
     NSString *element;
          }
 @end
 
 @implementation RssMainTableViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    UIColor *  color = [UIColor lightGrayColor];
 
+#pragma mark - View
+
+- (void)viewDidLoad {
     
+    [super viewDidLoad];
+    
+    //Configuramos vista
+    UIColor *  color = [UIColor lightGrayColor];
     [self.navigationController.navigationBar setTitleTextAttributes:
      @{NSForegroundColorAttributeName:color}];
-    // [self.navigationController.navigationBar setTintColor:[UIColor popularDarkBlue]];
-    
-    // NavigationBar style
-    float font = 15;
-    
     [self.navigationController.navigationBar setHidden:FALSE];
-
-    
-    [self.navigationController.navigationBar setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                      color, NSForegroundColorAttributeName,
-                                                                      [UIFont fontWithName:@"Geomanist-WZ-Book" size:font], NSFontAttributeName, nil]];
-    
-    
+    [self.navigationController.navigationBar setBackgroundColor:[UIColor lightGrayColor]];
     // Cambiamos el navigation Title.
     
-    [self.navigationItem setTitle:@"RSS Reader"];
+    [self.navigationItem setTitle:NSLocalizedString(@"RSS_STRING_TITLE", nil)];
 
     
-    UINib *cellNib = [UINib nibWithNibName:@"RSSTableViewCell" bundle:nil];
-    [self.tableViewRSS registerNib:cellNib forCellReuseIdentifier:@"RSSCell"];
+    [self registerTableView];
+    [self loadData];
+    [self configureSearch];
+    
+   
+}
+
+-(void) registerTableView
+
+{
+    UINib *cellNib = [UINib nibWithNibName:kNibRssCell bundle:nil];
+    [self.tableViewRSS registerNib:cellNib forCellReuseIdentifier:kRSSCell];
     self.tableViewRSS.estimatedRowHeight = 100;
-        self.tableViewRSS.rowHeight = UITableViewAutomaticDimension;
+    self.tableViewRSS.rowHeight = UITableViewAutomaticDimension;
     
     [self.tableViewRSS setDelegate:self];
     [self.tableViewRSS setDataSource:self];
     
+
+}
+
+-(void) configureSearch
+
+{
+    self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+    self.searchController.searchResultsUpdater = self;
+    self.searchController.dimsBackgroundDuringPresentation = NO;
+    
+    self.searchController.searchBar.delegate = self;
+    self.tableViewRSS.tableHeaderView = self.searchController.searchBar;
+    self.definesPresentationContext = YES;
+
+    
+}
+
+-(void)loadData
+{
     feeds = [[NSMutableArray alloc] init];
-    NSURL *url = [NSURL URLWithString:@"https://www.xatakandroid.com/tag/iphone/rss2.xml"];
+    NSURL *url = [NSURL URLWithString:kBaseURLRSS];
     parser = [[NSXMLParser alloc] initWithContentsOfURL:url];
     
     [parser setDelegate:self];
     [parser setShouldResolveExternalEntities:NO];
     [parser parse];
-
+    
+    
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
-#pragma mark - Table view data source
+#pragma mark - Table view
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -97,15 +116,34 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return feeds.count;
+    
+    
+    if (self.searchController.isActive && self.searchController.searchBar.text.length > 0) {
+        return self.searchResults.count;
+    }
+    else {
+        return feeds.count;
+    }
+    return 0;
+
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
    // RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:@"RSSCell" ];
     
     
-    RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:@"RSSCell"  forIndexPath:indexPath];
-    Noticia * datos = (Noticia *)[feeds objectAtIndex:indexPath.row];
+    RSSTableViewCell * cell = [_tableViewRSS dequeueReusableCellWithIdentifier:kRSSCell forIndexPath:indexPath];
+    Noticia * datos ;
+    
+
+    if (self.searchController.isActive && (![self.searchController.searchBar.text isEqualToString:@""])) {
+        datos =(Noticia *) [self.searchResults objectAtIndex:indexPath.row];
+    }
+    else {
+       datos= (Noticia *)[feeds objectAtIndex:indexPath.row];
+    }
+    
+    
     
     cell.titulo.text =datos.titulo;
     cell.descripcion.text = datos.descripcion;
@@ -119,7 +157,7 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
 
-    [self performSegueWithIdentifier:@"detail" sender:nil];
+    [self performSegueWithIdentifier:kSegueDetail sender:nil];
 }
 
 
@@ -142,6 +180,9 @@
     
 }
 
+#pragma mark - PARSER
+
+
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
     
     if ([element isEqualToString:@"title"]) {
@@ -153,7 +194,9 @@
         [link appendString:linkT];
     }else if ([element isEqualToString:@"description"]) {
 
-       NSString * result= [self firstImgUrlString:string];
+        NSString * result= [RSSUtils firstImgUrlString:string];
+        
+
         
         
         if (result)
@@ -162,7 +205,10 @@
 
         }
 
-        NSString *stringWithoutHTML = [self stringByStrippingHTML:string];
+        NSString *stringWithoutHTML =
+        [RSSUtils stringByStrippingHTML:string];
+        
+ 
         
         
         [description appendString:stringWithoutHTML];
@@ -198,45 +244,23 @@
 }
 
 
-- (NSString *)firstImgUrlString:(NSString *)string
-{
-    NSError *error = NULL;
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(<img\\s[\\s\\S]*?src\\s*?=\\s*?['\"](.*?)['\"][\\s\\S]*?>)+?"
-                                                                           options:NSRegularExpressionCaseInsensitive
-                                                                             error:&error];
-    
-    NSTextCheckingResult *result = [regex firstMatchInString:string
-                                                     options:0
-                                                       range:NSMakeRange(0, [string length])];
-    
-    if (result)
-        return [string substringWithRange:[result rangeAtIndex:2]];
-    
-    return nil;
-}
-
--(NSString *)stringByStrippingHTML:(NSString*)str
-{
-    NSRange r;
-    while ((r = [str rangeOfString:@"<[^>]+>" options:NSRegularExpressionSearch]).location     != NSNotFound)
-    {
-        str = [str stringByReplacingCharactersInRange:r withString:@""];
-    }
-    
-    str = [str stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-
-
-    return str;
-}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
 
      NSIndexPath *indexPath = [self.tableViewRSS indexPathForSelectedRow];
-    Noticia * datos = (Noticia *)[feeds objectAtIndex:indexPath.row];
+    Noticia * datos ;
+    
+    if (self.searchController.isActive && (![self.searchController.searchBar.text isEqualToString:@""])) {
+        datos =(Noticia *) [self.searchResults objectAtIndex:indexPath.row];
+    }
+    else {
+        datos= (Noticia *)[feeds objectAtIndex:indexPath.row];
+    }
+
 
 
         if([segue.identifier isEqualToString:@"detail"]){
-            RssDetailNewViewController *VC = (RssDetailNewViewController*)segue.destinationViewController;
+            RssDetailViewController *VC = (RssDetailViewController*)segue.destinationViewController;
             
         
           
@@ -244,4 +268,44 @@
         }
 }
 
+#pragma mark - Getters / Setters
+
+- (UISearchController *)searchController {
+    if (!_searchController) {
+        _searchController = [[UISearchController alloc]initWithSearchResultsController:nil];
+        _searchController.searchResultsUpdater = self;
+        _searchController.dimsBackgroundDuringPresentation = NO;
+        _searchController.searchBar.delegate = self;
+        [_searchController.searchBar sizeToFit];
+    }
+    return _searchController;
+}
+
+- (NSArray *)searchResults {
+    NSString *searchString = [self.searchController.searchBar.text uppercaseString];
+    NSMutableArray *array= [feeds mutableCopy] ;
+    [array filterUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        Noticia *customObject=(Noticia *) evaluatedObject;
+        
+        
+        return ([customObject.titulo.uppercaseString containsString:searchString]);
+    }]];
+    
+    return array;
+    
+    
+}
+#pragma mark - UISearchControllerDelegate
+
+- (void)updateSearchResultsForSearchController:(UISearchController *)searchController
+{
+    
+      [self.tableView reloadData];
+}
+
+
+- (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope
+{
+    [self updateSearchResultsForSearchController:self.searchController];
+}
 @end

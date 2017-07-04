@@ -26,7 +26,7 @@
                             <constraint firstAttribute="width" constant="60" id="ob6-pX-gPa"/>
                         </constraints>
                     </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" text="Esto es un ejemplo de titulo a dos lineas " textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sct-T3-7zO">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" text="Esto es un ejemplo de titulo a dos lineas " textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sct-T3-7zO">
                         <rect key="frame" x="76" y="8" width="221" height="46"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="46" id="JaE-6R-c3d"/>

@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface RssMainTableViewController : UITableViewController <NSXMLParserDelegate>
+@interface RssMainTableViewController : UITableViewController <NSXMLParserDelegate ,  UISearchControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
+
 @property (strong, nonatomic) IBOutlet UITableView *tableViewRSS;
+@property (nonatomic, strong) UISearchController *searchController;
+
 
 
 @end

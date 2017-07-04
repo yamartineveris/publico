@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface RSSTableViewCell : UITableViewCell
+
 @property (weak, nonatomic) IBOutlet UIImageView *imagen;
 @property (weak, nonatomic) IBOutlet UILabel *titulo;
 @property (weak, nonatomic) IBOutlet UILabel *descripcion;

@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  RSSReader
+
+  Created by Yago de Martin Lopez on 4/7/17.
+  Copyright © 2017 Yago de Martin Lopez. All rights reserved.
+*/
+"RSS_STRING_TITLE" = "RSS Reader";
+"RSS_STRING_BUTTON" = "Ver en el navegador";
